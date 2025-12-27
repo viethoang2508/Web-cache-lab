@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # Service Backend Application (PHP)
+  app:
+    image: php:8.2-fpm-alpine
+    container_name: lab_app_backend
+    volumes:
+      - ./app:/var/www/html # <-- Chỉ giữ volume này ở đây
+    networks:
+      - lab-network
+
+  # Service Caching Proxy (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: lab_nginx_cache
+    ports:
+      - "10131:80" # Giữ nguyên cổng 10131 của bạn
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      # - ./app:/var/www/html # <-- XÓA DÒNG NÀY
+    depends_on:
+      - app
+    networks:
+      - lab-network
+
+networks:
+  lab-network:
+    driver: bridge
